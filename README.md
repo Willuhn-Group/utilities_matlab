@@ -1,4 +1,4 @@
-# matlab_utilities
+# utilities_matlab
 
 General-purpose MATLAB utilities for everyday data analysis and figure generation.
 
