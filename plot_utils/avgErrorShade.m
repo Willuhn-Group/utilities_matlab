@@ -1,14 +1,14 @@
 function outPrint = avgErrorShade(cfg)
 
-% avgErrorShade function plots the mean trace and shadow dispersion 
-% 
+% avgErrorShade function plots the mean trace and shadow dispersion
+%
 % Inputs
 %   cfg.xdata:  x axis data values. If empty xdata = sample number of ydata.
-%   cfg.ydata:  y axis data values. Can be either a 2D matrix [nobservations x  nsamples] 
-%           or a struct containing mean_data and std_vectors.
-%   cfg.err_flag: can be 'sem' (standard error fo the mean; 'ci' (95%
-%                 confidence interval) or 'std' (standard deviation)
-%   cfg.color: color definition same as Matlab's
+%   cfg.ydata:  y axis data values, 2D matrix [nobservations x nsamples]. A
+%               matrix can also be the only input (cfg = ydata).
+%   cfg.errRef: can be 'sem' (standard error of the mean, default), 'ci'
+%               (95% confidence interval) or 'std' (standard deviation)
+%   cfg.color:  color definition same as Matlab's
 %   cfg.alpha:  transparency level
 %
 % Outputs
@@ -16,13 +16,9 @@ function outPrint = avgErrorShade(cfg)
 %   out: struct containing the following fields
 %     avg: average data
 %     err: error data
-%     handle: average and error plots handles 
-%       
-%   Sergio Conde, 2026. NIN. Willuhn's Lab. 
-
-% if nargin == 2
-%   x_data = var1, ydata = var2
-% end
+%     handle: average and error plots handles
+%
+%   Sergio Conde, 2026. NIN. Willuhn's Lab.
 
 % if the input is a matrix
 if ~isstruct(cfg)
@@ -30,40 +26,43 @@ if ~isstruct(cfg)
     cfg = [];
     cfg.ydata = ydata;
 end
-nvalid = sum(~isnan(cfg.ydata),1);
+nValid = sum(~isnan(cfg.ydata),1);
 
 % check defaults %
- cfg = checkCfg(cfg);
+cfg = checkCfg(cfg);
 
 % compute average and standard deviation
 out.avg = mean(cfg.ydata,1,'omitnan');
-
 out.avg = out.avg(:).';
 
 % adjust error to request if necessary
-out.err  = std(cfg.ydata,[],1,"omitnan");
-switch cfg.err_ref
+out.err = std(cfg.ydata,[],1,"omitnan");
+switch cfg.errRef
     case 'sem'
-        out.err = out.err./sqrt(nvalid);
+        out.err = out.err./sqrt(nValid);
     case 'ci'
-        out.err = out.err./sqrt(nvalid);
-        ts = tinv(0.975,length(out.avg) - 1);
-        out.err = ts * out.err;
+        out.err = out.err./sqrt(nValid);
+        ts = tinv(0.975,nValid - 1);
+        out.err = ts .* out.err;
+    case 'std'
+        % standard deviation, already computed
+    otherwise
+        error('Invalid errRef: %s. Use ''sem'', ''ci'' or ''std''',cfg.errRef)
 end
 out.err = out.err(:).';
 
 % set x_axis for plotting
 if ~isempty(cfg.xdata)
-    x_vector = [cfg.xdata fliplr(cfg.xdata)];
+    xVector = [cfg.xdata(:).' fliplr(cfg.xdata(:).')];
 else
-    x_vector = [1:length(out.avg) length(out.avg):-1:1];
+    xVector = [1:length(out.avg) length(out.avg):-1:1];
 end
 
 % plot error (shade) and average
-out.handle.err = fill(x_vector,[out.avg - out.err fliplr(out.avg + out.err)],...
+out.handle.err = fill(xVector,[out.avg - out.err fliplr(out.avg + out.err)],...
     cfg.color,'FaceAlpha',cfg.alpha,'EdgeAlpha',0.1);
 hold on
-out.handle.avg = plot(x_vector(1:length(out.avg)),out.avg,...
+out.handle.avg = plot(xVector(1:length(out.avg)),out.avg,...
     'color',cfg.color,...
     'LineWidth',1);
 
@@ -83,8 +82,8 @@ if ~isfield(cfg,'xdata')
     cfg.xdata = [];
 end
 
-if ~isfield(cfg,'err_ref')
-    cfg.err_ref = 'sem';
+if ~isfield(cfg,'errRef')
+    cfg.errRef = 'sem';
 end
 
 if ~isfield(cfg,'color')
