@@ -1,30 +1,41 @@
 function fileList = projectFiles(cfg)
-
 % fileList = projectFiles(cfg)
 %
-% projectFiles function lists all the files matching the configuration
-% contained in cfg (folder structure and file naming)
+% Lists the files of a project that follow a folder structure (one folder
+% level per item in cfg.levelName) and a file naming pattern, and labels
+% each file with the name of its folder at every level.
 %
-%   Inputs:
-%     cfg: structure containing the following fields
-%       mainPath: main project folder path                                            [string]
-%       levelName: name associated with each level of the organigram.                 [cell array of strings]
-%       folderCode: string codification of the folders associated to each level.    [cell array of strings]
-%       fileCode: string codification of the required files. If empty, all files on    [string]
-%                 each folder will be listed.                                          
-%   Outputs:
-%     out_files: Output struct containing the following fields
-%       name: file name
-%       folder: file folder
-%       file_path: full file path
-%       + one field per level following the name con cfg.levelName input
+% Inputs:
+%   cfg: configuration struct with fields                                  [struct]
+%     mainPath: main project folder                                         [char]
+%     levelName: name of each folder level, used as output field names      [cell]
+%     folderCode: folder pattern of each level, as accepted by dir          [cell]
+%       (e.g. 'rat*'), one per level
+%     fileCode: file name pattern (e.g. '*.mat'). If empty, all files of     [char]
+%       each folder are listed
 %
-% v1.0: April 2023
-% v2.0: August 2026
+% Outputs:
+%   fileList: one element per file, with fields                            [struct]
+%     name: file name                                                       [char]
+%     folder: file folder                                                   [char]
+%     filePath: full file path                                              [char]
+%     <levelName>: one field per level, with the folder name at that level  [char]
 %
-% Sergio Conde-Ocazionez, August 2024. 
-% Neuromodulation & Behavior Laboratory
-% Netherlands Institute for Neuroscience.
+% Example:
+%   cfg = []; cfg.mainPath = 'D:\myProject';
+%   cfg.levelName = {'rat','session'}; cfg.folderCode = {'rat*','day*'};
+%   cfg.fileCode = '*.mat';
+%   fileList = projectFiles(cfg);
+%
+% Dependencies: none
+%
+% Version history:
+%   v1.0  Apr 2023  First version (proj_organigram)
+%   v2.0  Aug 2026  Renamed to projectFiles; camelCase cfg fields
+%   v2.1  Sep 2026  Output field file_path renamed to filePath
+%
+% Author(s): Sergio Conde-Ocazionez
+% Neuromodulation & Behavior Laboratory, Netherlands Institute for Neuroscience
 
 
 % defining the search path %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

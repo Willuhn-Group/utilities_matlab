@@ -1,26 +1,46 @@
 function [selEntry,requestConfig] = getEntry(entryList,varargin)
-
-% [selEntry,entryLine] = getEntry(entryList,varargin)
+% [selEntry, requestConfig] = getEntry(entryList, varargin)
 %
-% pick_files function lists files from the ref_files (output of the proj_organigram function)
+% Selects the entries (rows) of a table or struct array that match a
+% request. Each requested field is compared with a contrast: 'equal'
+% (default), 'lower', 'higher' or 'range'. Non-numeric fields are always
+% compared with 'equal'. Requested fields missing from entryList are
+% ignored with a warning.
 %
-%   Inputs:
-%     ref_files: output of the proj_organigram function                     [struct]
-%                Note: However, this function shuould work to select
-%                specific lines of any structure.
-%     field_name
-%     field_value: selecting criteria for field_name. 
-%          
-%   Outputs:
-%     out_files: Output struct containing the same fiels as ref_files
-%       name: file name
-%       folder: file folder
-%       file_path: full file path
-%       + one field per level following the name con cfg.level_name input
+% Inputs:
+%   entryList: entries to select from (e.g. the trials from getTrials)    [table/struct]
+%   varargin: the request, in one of these forms:
+%     name-value pairs: field name and accepted value(s), all compared     [char, any]
+%       with 'equal'
+%     request struct: one field per requested field, with the value(s)     [struct]
+%       to compare, plus the optional field
+%       contrast: one field per requested field with 'equal', 'lower',     [struct]
+%         'higher' or 'range' (default: 'equal'). 'range' takes [min max]
+%         and includes both limits
+%     request table: converted with table2struct                           [table]
 %
-% Sergio Conde-Ocazionez, August 2024. 
-% Neuromodulation & Behavior Laboratory
-% Netherlands Institute for Neuroscience.
+% Outputs:
+%   selEntry: selected entries, same type as entryList                      [table/struct]
+%   requestConfig: the request as applied, with fields                     [struct]
+%     contrast: contrast used for each requested field                     [struct]
+%     entryLine: indices of the selected entries in entryList              [double]
+%     ignored: requested fields not found in entryList (only if any)       [cell]
+%
+% Example:
+%   itiTrials = getEntry(trialStruct.trials, 'interval', 'iti');
+%   request = []; request.count = [5 15]; request.contrast.count = 'range';
+%   [trials, requestConfig] = getEntry(trialStruct.trials, request);
+%
+% Dependencies: none
+%
+% Version history:
+%   v0.1  Aug 2026  First version
+%   v0.2  Aug 2026  Request as struct with contrasts; second output requestConfig
+%   v0.3  Sep 2026  'equal' accepts several values; request as table
+%   v0.4  Oct 2026  'range' includes its limits (>= and <=)
+%
+% Author(s): Sergio Conde-Ocazionez
+% Neuromodulation & Behavior Laboratory, Netherlands Institute for Neuroscience
 
 % check minimum number of input arguments
 if nargin < 2
