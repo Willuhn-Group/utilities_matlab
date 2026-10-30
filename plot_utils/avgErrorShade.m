@@ -1,30 +1,45 @@
 function outPrint = avgErrorShade(cfg)
-
-% avgErrorShade function plots the mean trace and shadow dispersion
+% out = avgErrorShade(cfg)
 %
-% Inputs
-%   cfg.xdata:  x axis data values. If empty xdata = sample number of ydata.
-%   cfg.ydata:  y axis data values, 2D matrix [nobservations x nsamples]. A
-%               matrix can also be the only input (cfg = ydata).
-%   cfg.errRef: can be 'sem' (standard error of the mean, default), 'ci'
-%               (95% confidence interval) or 'std' (standard deviation)
-%   cfg.color:  color definition same as Matlab's
-%   cfg.alpha:  transparency level
+% Plots the mean of several traces as a line and their dispersion (SEM,
+% 95% confidence interval or SD) as a shaded area, in the current axes.
 %
-% Outputs
+% Inputs:
+%   cfg: configuration struct with fields, or only the ydata matrix         [struct/double]
+%     ydata: data, one trace per row [nObservations x nSamples]             [double]
+%     xdata: x axis values (optional, default: sample number)              [double]
+%     errRef: 'sem', 'ci' (95% confidence interval) or 'std'               [char]
+%       (optional, default: 'sem')
+%     color: line and shade color, as in MATLAB (optional, default: 'k')   [char/double]
+%     alpha: shade transparency (optional, default: 0.4)                   [double]
 %
-%   out: struct containing the following fields
-%     avg: average data
-%     err: error data
-%     handle: average and error plots handles
+% Outputs:
+%   out: struct with fields (only if requested)                            [struct]
+%     avg: mean of each sample                                             [double]
+%     err: error of each sample, as set by errRef                          [double]
+%     handle: handles of the shade (err) and the mean line (avg)           [struct]
 %
-%   Sergio Conde, 2026. NIN. Willuhn's Lab.
+% Example:
+%   cfg = []; cfg.xdata = 0:0.1:2; cfg.ydata = randn(20, 21);
+%   cfg.errRef = 'ci'; cfg.color = 'r';
+%   out = avgErrorShade(cfg);
+%
+% Dependencies: Statistics and Machine Learning Toolbox (tinv, for 'ci')
+%
+% Version history:
+%   v0.1  Mar 2026  First version (avg_err_shade)
+%   v0.2  Mar 2026  SEM computation updated
+%   v0.3  Oct 2026  Renamed to avgErrorShade; camelCase fields (errRef);
+%                   'std' option; fixed degrees of freedom of 'ci'
+%
+% Author(s): Sergio Conde-Ocazionez
+% Neuromodulation & Behavior Laboratory, Netherlands Institute for Neuroscience
 
 % if the input is a matrix
 if ~isstruct(cfg)
-    ydata = cfg;
+    yData = cfg;
     cfg = [];
-    cfg.ydata = ydata;
+    cfg.ydata = yData;
 end
 nValid = sum(~isnan(cfg.ydata),1);
 

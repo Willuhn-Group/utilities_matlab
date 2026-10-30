@@ -1,21 +1,40 @@
 function [hBar,hDots] = barDots(data,cfg)
-
-% barDots(data,cfg)
+% [hBar, hDots] = barDots(data, cfg)
 %
-% plots bars, despersion and individual data points
-% 
-% Inputs
-%   data: vector with points
-%   cfg: configuration struct containing the following fields
-%       position: position of each bar (columns in data)
-%       barColor
-%       maxJitter: maximum jitter of the individual data points around the
-%                   bar's position
-%       dotColor
-%       paired: true if data is paired and lines bwtween data points should be ploted
-%       transparency: of the bars
+% Plots one bar per column of data (mean), with error bars and the
+% individual data points jittered around each bar. Paired data can be
+% joined with lines.
 %
-%   Sergio Conde, 2023. NIN. Willuhn's Lab. 
+% Inputs:
+%   data: data, one column per bar [nObservations x nBars]                 [double]
+%   cfg: configuration struct with fields (all optional)                    [struct]
+%     position: x position of each bar (default: 1:nBars)                  [double]
+%     barColor: bar color (default: 'k')                                   [char/double]
+%     BarWidth: bar width (default: 0.8)                                   [double]
+%     transparency: bar transparency (default: 0.5)                        [double]
+%     error: true for SEM, false for SD error bars (default: true)         [logical]
+%     dots: 'on' or 'off' to show the data points (default: 'on')          [char]
+%     dotColor: color of the data points (default: 'k')                    [char/double]
+%     dotSize: marker size of the data points (default: 3)                 [double]
+%     maxJitter: maximum jitter of the points around the bar (default: 0.5) [double]
+%     paired: true to join the points of each row with lines (default: false) [logical]
+%
+% Outputs:
+%   hBar: bar handle                                                       [Bar]
+%   hDots: data point handle(s), one per row if paired                     [Line]
+%
+% Example:
+%   cfg = []; cfg.paired = true; cfg.barColor = [0.6 0.6 0.6];
+%   [hBar, hDots] = barDots(randn(10, 2) + [1 2], cfg);
+%
+% Dependencies: none
+%
+% Version history:
+%   v0.1  2023      First version
+%   v0.2  Oct 2026  Added to utilities_matlab
+%
+% Author(s): Sergio Conde-Ocazionez
+% Neuromodulation & Behavior Laboratory, Netherlands Institute for Neuroscience
 
 
 cfg = checkCfg(data,cfg);
@@ -64,8 +83,8 @@ if cfg.paired
     xDots = reshape(xDots,size(data));
     nDots = size(data,1);
     hdots = nan(1,nDots);
-    for iDot = 1:nDots
-        hdots(iDot) = plot(xDots(iDot,:),data(iDot,:),'o-',...
+    for idot = 1:nDots
+        hdots(idot) = plot(xDots(idot,:),data(idot,:),'o-',...
             'markersize',cfg.dotSize, ...
             'Color', 0.75 * ones(1,3),...
             'MarkerFaceColor',cfg.dotColor,...

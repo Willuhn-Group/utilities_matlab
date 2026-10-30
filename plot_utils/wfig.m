@@ -1,17 +1,26 @@
 function hf = wfig(varargin)
-
-% wfig(nfig)
+% hf = wfig(figNumber)
 %
-% Inputs
-%   nfig [numeric]: number of the figure to be either opened or created
+% Opens (or creates) a figure with a white background. Without input it
+% opens a new figure.
 %
-% Outputs
-%   hf: figure handle
+% Inputs:
+%   figNumber: number of the figure (optional, default: next free figure)  [double]
 %
-% This function opens the nfig figure and set white. If no nfig input is
-% provided, the function will open the next available figure.
+% Outputs:
+%   hf: figure handle (only if requested)                                  [Figure]
 %
-% Sergio Conde-Ocazionez, 2022.
+% Example:
+%   wfig(1); plot(1:10);
+%
+% Dependencies: none
+%
+% Version history:
+%   v0.1  2022      First version
+%   v0.2  Sep 2026  Returns the figure handle only when it is requested
+%
+% Author(s): Sergio Conde-Ocazionez
+% Neuromodulation & Behavior Laboratory, Netherlands Institute for Neuroscience
 
 if nargin == 1
     h = figure(varargin{1});
